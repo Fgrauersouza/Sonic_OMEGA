@@ -21,3 +21,18 @@ corretamente.
  sou iniciante no "git/github world".
 
  EM BREVE-> mais mudanças =).
+
+ ----------------------------------------------------------------
+ To english speakers =) - 
+ What is SONIC OMEGA? It's just a little project, copy of Sonic 
+ The Hedgehog 1.
+
+ It's "opensource" - just to test my learning process with Marsdev (Sgdk)
+
+ Just download, and type on the terminal "cd Sonic_OMEGA" and them "sudo make"
+ the SONIC OMEGA folder, doesn't do anything, so, you can delete (if you want)
+
+ Besides the current code, it will be improved!
+
+ That's it.
+ 
