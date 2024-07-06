@@ -13,7 +13,8 @@
 //#define ANIM_RUN 3
 #define ANIM_STOP 4
 
-
+#define SUBTICKPERSECOND    76800
+#define TICKPERSECOND       300
 
 
 //u16 numTimer = 0;
@@ -33,40 +34,44 @@ Map* level_1_map;
 Sprite* player; // Name do "Sprite" é "player".
 int player_x = 4;
 int player_y = -360;
+int idle_timer = 0;
+int idle_limit = 100;
 
 
+//u32 subtick = 1;
 
 // int anim = 1; -- teste da animação.
 
 // ----  const_int ANIM_STAND = 1; ----- pode ser usado em lugar do "int anim".
 
-
+//int y = 0;
 int x = 0; //associado a linha "x += 1;" 
+//int A = 0;
+//int limit = 10;
 
+
+static void idleTimer();
 static void handleInput();
-//static void idle_function();
-
-static void joyEvent(u16 joy, u16 changed, u16 state) {
-    if ( ((!(state & BUTTON_LEFT)) && (changed & BUTTON_LEFT))   ||
-         ((!(state & BUTTON_RIGHT))&& (changed & BUTTON_RIGHT))  ||
-         ((!(state & BUTTON_UP))   && (changed & BUTTON_UP))     ||
-         ((!(state & BUTTON_DOWN)) && (changed & BUTTON_DOWN) )  ||
-         ((!(state & BUTTON_A))    && (changed & BUTTON_A))      ||
-         ((!(state & BUTTON_B))    && (changed & BUTTON_B))      ||
-         ((!(state & BUTTON_C))    && (changed & BUTTON_C))      ||
-         ((!(state & BUTTON_X))    && (changed & BUTTON_X))      ||
-         ((!(state & BUTTON_Y))    && (changed & BUTTON_Y))      ||
-         ((!(state & BUTTON_Z))    && (changed & BUTTON_Z))      ||
-         ((!(state & BUTTON_START))&& (changed & BUTTON_START))  ||
-         ((!(state & BUTTON_MODE)) && (changed & BUTTON_MODE))) {
-
-       SPR_setAnim(player, ANIM_STAND);
-
-
-}
     
-}
+static void joyEvent(u16 joy, u16 changed, u16 state)
+{
+   if (state & BUTTON_LEFT) {
+     idle_timer = 0;                 
+   }
+   else if (changed & BUTTON_LEFT) {
 
+    idle_timer++;
+   }
+   if (state & BUTTON_RIGHT) {
+
+    idle_timer = 0;
+   }
+   else if (changed & BUTTON_RIGHT)
+   {
+    idle_timer++;
+   }
+
+}
 
 
 
@@ -81,9 +86,9 @@ int main()
     SPR_init();
     PAL_setPalette(PAL2, our_sprite.palette->data, DMA);
     player = SPR_addSprite(&our_sprite, player_x, player_y, TILE_ATTR(PAL2, FALSE, FALSE, FALSE)); 
-
+    //A = y + 1;
     // Valor de localização "our_sprite, 2, -360" - testar esses valores antes listados!!!
-   
+    JOY_setEventHandler(joyEvent);
 
 
 
@@ -97,14 +102,15 @@ int main()
 	
 	while(TRUE) // Game Loop
     {
-        handleInput();
-        //SPR_setPosition();
-        SPR_update(); 
-       
-        
 
+        handleInput();
+        
+        idleTimer(); 
+        
+        SPR_update();
+        //SPR_setPosition();
         // else if (idle_timer == idle_duration) {
-          
+        
       // }               
         //MAP_scrollTo(level_1_map, x, 768); 
         // porque é necessário essa linha no "loop"? Porque é necessário manter o Scroll da tela do mapa, durante toda a exibição"
@@ -124,21 +130,25 @@ static void handleInput()
        player_x += 1; 
        SPR_setAnim(player, ANIM_WALK);
        SPR_setHFlip(player, FALSE);
-       
+       idle_timer = 0;
     }
     else if (value & BUTTON_LEFT) {
        player_x -= 1;
        SPR_setAnim(player, ANIM_WALK);
        SPR_setHFlip(player, TRUE); 
-      
+       idle_timer = 0;
     }
     
     if(!(value & BUTTON_RIGHT) && !(value & BUTTON_LEFT) && !(value & BUTTON_UP) && !(value & BUTTON_DOWN))
     {
        SPR_setAnim(player, ANIM_NOR);
        
-
+       
     }
+   
+  
+    
+    
     //else if (!(value & BUTTON_RIGHT) && !(value & BUTTON_LEFT) && !(value & BUTTON_UP) && !(value & BUTTON_DOWN))
    
   
@@ -148,6 +158,19 @@ static void handleInput()
 
 }
 
+static void idleTimer()
+{
+    if (idle_timer < idle_limit) {
+   idle_timer++;
+   
+  }
+    else if (idle_timer == idle_limit) {
+   
+   SPR_setAnim(player, ANIM_STAND);
+   //idle_timer = 0;
+
+} 
+}
 
 
  
